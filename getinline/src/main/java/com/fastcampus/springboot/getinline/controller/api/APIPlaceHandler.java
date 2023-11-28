@@ -12,7 +12,7 @@ import static org.springframework.web.servlet.function.ServerResponse.created;
 
 // funtional interface HandlerFunction을 implements 해서 메소드 골격을 만들어줌 
 // (골격 만드는용으로 쓰고 지움)
-@Component
+//@Component
 public class APIPlaceHandler{
 
     public ServerResponse getPlaces(ServerRequest request){

@@ -10,12 +10,12 @@ import org.springframework.web.servlet.function.ServerResponse;
 
 import java.util.List;
 
-@Configuration
+//@Configuration
 public class APIPlaceRouter {
 
     // 함수 기반 설계
     // 중첩 라우팅 -> 트리 구조 만듦
-    @Bean
+//    @Bean
     public RouterFunction<ServerResponse> placeRouter(APIPlaceHandler apiPlaceHandler){
         return RouterFunctions.route().nest(RequestPredicates.path("/api/places"), builder -> builder
                 .GET("", apiPlaceHandler::getPlaces)

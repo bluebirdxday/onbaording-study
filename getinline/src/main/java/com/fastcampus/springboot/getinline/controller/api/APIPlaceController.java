@@ -1,11 +1,13 @@
 package com.fastcampus.springboot.getinline.controller.api;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.List;
 
-//@RequestMapping("/api")
-//@RestController
+@RequestMapping("/api")
+@RestController
 public class APIPlaceController {
 
     @GetMapping("/places")
