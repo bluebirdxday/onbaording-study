@@ -3,15 +3,20 @@ package com.fastcampus.springboot.getinline.controller.api;
 import com.fastcampus.springboot.getinline.constant.ErrorCode;
 import com.fastcampus.springboot.getinline.dto.APIErrorResponse;
 import com.fastcampus.springboot.getinline.exception.GeneralException;
+import com.fastcampus.springboot.getinline.service.EventService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RequestMapping("/api")
 @RestController
 public class APIEventController {
+
+    private final EventService eventService;
 
     @GetMapping("/events")
     public List<String> getEvents(){
