@@ -3,13 +3,17 @@ package com.fastcampus.springboot.getinline.controller.error;
 import com.fastcampus.springboot.getinline.constant.ErrorCode;
 import com.fastcampus.springboot.getinline.dto.APIErrorResponse;
 import com.fastcampus.springboot.getinline.exception.GeneralException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Map;
 
@@ -22,7 +26,8 @@ import java.util.Map;
 // 그냥 의미적인 부분.. @RestControllerAdvice 이게 아니면 안되는 게 아님 @ControllerAdvice랑 똑같이 동작
 
 // API에 대한 컨트롤 어드바이스
-public class APIExceptionHandler {
+public class APIExceptionHandler extends ResponseEntityExceptionHandler {   
+                    // spring web에서 발생하는 에러들을 처리하기 위해 상속받음 -> 그쪽에서 발생하는 에러를 알아서 처리함
 
     // general exception이 터졌을 경우
     @ExceptionHandler
@@ -41,6 +46,7 @@ public class APIExceptionHandler {
     }
 
     // 전체적으로 에러가 터졌을 경우
+    // 우리가 예상하지 못한 일반적인 에러를 잡는 부분이라 전부 인터널 에러라고 확신하고 세팅해준 것
     @ExceptionHandler
     public ResponseEntity<APIErrorResponse> exception(Exception e){
 
@@ -52,5 +58,20 @@ public class APIExceptionHandler {
                 .body(APIErrorResponse.of(
                         false, errorCode, errorCode.getMessage(e)
                 ));
+    }
+
+    // 상속 받은 것만으로 알아서 오류를 잘 처리하지만 다른 핸들러처럼 json 형태로 반환시키기 위해 재정의함
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        ErrorCode errorCode = statusCode.is4xxClientError()?
+                ErrorCode.SPRING_BAD_REQUEST :
+                ErrorCode.SPRING_INTERNAL_ERROR;
+        return super.handleExceptionInternal(
+                ex,
+                APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(ex)),
+                headers,
+                statusCode,
+                request
+        );
     }
 }

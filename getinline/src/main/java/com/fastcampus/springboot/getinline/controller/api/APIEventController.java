@@ -15,8 +15,8 @@ public class APIEventController {
 
     @GetMapping("/events")
     public List<String> getEvents(){
-        throw new GeneralException("테스트 메시지");  // -> APIExceptionHandler
-//        return List.of("event1", "event2");
+//        throw new GeneralException("테스트 메시지");  // -> APIExceptionHandler
+        return List.of("event1", "event2");
     }
 
     @PostMapping("/events")
@@ -26,8 +26,8 @@ public class APIEventController {
 
     @GetMapping("/events/{eventId}")
     public String getEvent(@PathVariable Integer eventId){
-        throw new RuntimeException("runtime 테스트 메시지");  // -> APIExceptionHandler
-//        return "event" + eventId;
+//        throw new RuntimeException("runtime 테스트 메시지");  // -> APIExceptionHandler
+        return "event" + eventId;
     }
 
     @PutMapping("/events/{eventId}")
