@@ -1,0 +1,54 @@
+package com.fastcampus.springboot.getinline.dto;
+
+import com.fastcampus.springboot.getinline.constant.EventStatus;
+
+import java.time.LocalDateTime;
+
+public record EventResponse(
+        Long placeId,
+        String eventName,
+        EventStatus eventStatus,
+        LocalDateTime eventStartDatetime,
+        LocalDateTime eventEndDatetime,
+        Integer currentNumberOfPeople,
+        Integer capacity,
+        String memo
+) {
+    public static EventResponse of(
+            Long placeId,
+            String eventName,
+            EventStatus eventStatus,
+            LocalDateTime eventStartDatetime,
+            LocalDateTime eventEndDatetime,
+            Integer currentNumberOfPeople,
+            Integer capacity,
+            String memo
+    ) {
+        return new EventResponse(
+                placeId,
+                eventName,
+                eventStatus,
+                eventStartDatetime,
+                eventEndDatetime,
+                currentNumberOfPeople,
+                capacity,
+                memo
+        );
+    }
+    
+    
+    // EventDTO를 받아서 그로부터 EventResponse 만드는 메소드
+    public static EventResponse from(EventDTO eventDTO){
+        if (eventDTO == null) { return null; }
+        return EventResponse.of(
+                eventDTO.placeId(),
+                eventDTO.eventName(),
+                eventDTO.eventStatus(),
+                eventDTO.eventStartDatetime(),
+                eventDTO.eventEndDatetime(),
+                eventDTO.currentNumberOfPeople(),
+                eventDTO.capacity(),
+                eventDTO.memo()
+        );
+    }
+}

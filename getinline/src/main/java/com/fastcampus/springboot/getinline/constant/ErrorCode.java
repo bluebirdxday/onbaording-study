@@ -18,6 +18,7 @@ public enum ErrorCode {
 
     BAD_REQUEST(10000, ErrorCategory.CLIENT_SIDE, "Bad request"),
     SPRING_BAD_REQUEST(10001, ErrorCategory.CLIENT_SIDE, "Spring-detected bad request"),
+    VALIDATION_ERROR(10002, ErrorCategory.CLIENT_SIDE, "validation error"),
     // bad request 중에서도 spring이 발생시킨 것만 따로
 
     INTERNAL_ERROR(20000, ErrorCategory.SERVER_SIDE, "Internal error"),
@@ -31,7 +32,7 @@ public enum ErrorCode {
 
     // 예외가 있을 경우 예외 메세지
     public String getMessage(Exception e) {
-        return this.getMessage(e.getMessage());
+        return this.getMessage(this.getMessage() + " - " + e.getMessage());
     }
 
     // 메세지를 사용자가 직접 입력하는 경우

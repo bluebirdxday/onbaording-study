@@ -3,7 +3,9 @@ package com.fastcampus.springboot.getinline.service;
 import com.fastcampus.springboot.getinline.constant.EventStatus;
 import com.fastcampus.springboot.getinline.dto.EventDTO;
 import com.fastcampus.springboot.getinline.repository.EventRepository;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +23,9 @@ public class EventService{
             String eventName,
             EventStatus eventStatus,
             LocalDateTime eventStartDatetime,
-            LocalDateTime eventEndDatetime)
+            LocalDateTime eventEndDatetime
+            // 문자열로 들어간 query param을 local date time으로 변환할 수 있게 도와주는 애노테이션
+    )
     {
         return eventRepository.findEvents(placeId, eventName, eventStatus, eventStartDatetime, eventEndDatetime); // => 책임을 리포지토리에 위임해서 결과만 바로 돌려주게끔
     }

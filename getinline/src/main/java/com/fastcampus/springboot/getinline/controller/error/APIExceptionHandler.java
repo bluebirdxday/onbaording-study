@@ -3,6 +3,7 @@ package com.fastcampus.springboot.getinline.controller.error;
 import com.fastcampus.springboot.getinline.constant.ErrorCode;
 import com.fastcampus.springboot.getinline.dto.APIErrorResponse;
 import com.fastcampus.springboot.getinline.exception.GeneralException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -29,6 +30,25 @@ import java.util.Map;
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {   
                     // spring web에서 발생하는 에러들을 처리하기 위해 상속받음 -> 그쪽에서 발생하는 에러를 알아서 처리함
 
+    @ExceptionHandler
+    // ConstraintViolationException => 스프링이 알아서 처리해주지 않기 때문에 직접 exception handler 만들어줌
+    public ResponseEntity<Object> general(ConstraintViolationException e, WebRequest request){
+
+        ErrorCode errorCode = ErrorCode.VALIDATION_ERROR;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        return super.handleExceptionInternal(
+                e,
+                APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(e)),
+                HttpHeaders.EMPTY,
+                status,
+                request
+        );
+
+    }
+
+
+
     // general exception이 터졌을 경우
     @ExceptionHandler
     public ResponseEntity<APIErrorResponse> general(GeneralException e){
@@ -44,6 +64,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                         false, errorCode, errorCode.getMessage(e)
                 ));
     }
+
 
     // 전체적으로 에러가 터졌을 경우
     // 우리가 예상하지 못한 일반적인 에러를 잡는 부분이라 전부 인터널 에러라고 확신하고 세팅해준 것
