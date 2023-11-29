@@ -1,7 +1,9 @@
 package com.fastcampus.springboot.getinline.service;
 
+import com.fastcampus.springboot.getinline.constant.ErrorCode;
 import com.fastcampus.springboot.getinline.constant.EventStatus;
 import com.fastcampus.springboot.getinline.dto.EventDTO;
+import com.fastcampus.springboot.getinline.exception.GeneralException;
 import com.fastcampus.springboot.getinline.repository.EventRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,12 +17,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
-
 
 
     @InjectMocks   // -> 목으로 주입
@@ -57,6 +60,30 @@ class EventServiceTest {
         // verify(eventRepository).findEvents(null, null, null, null, null); -> 위와 동일한 동작을 함
     }
 
+    @DisplayName("이벤트를 검색하는데 에러가 발생한 경우, 줄서기 프로젝트 기본 에러로 전환하여 예외 던진다.")
+    @Test
+    void givenDataRelatedException_whenSearchingEvents_thenThrowsGeneralException(){
+        // Given
+        RuntimeException e = new RuntimeException("This is test");
+        given(eventRepository.findEvents(any(), any(), any(), any(), any())).willThrow(e);
+        // 이벤트 리포지토리에서 던지는 예외 불분명 -> 최상의 Exception 던져서 시뮬레이션
+
+        // When
+        Throwable thrown = catchThrowable(()->{
+                sut.getEvents(null, null, null, null, null);
+        });
+
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(GeneralException.class)
+                        .hasMessageContaining(ErrorCode.DATA_ACCESS_ERROR.getMessage());
+
+        then(eventRepository).should().findEvents(any(), any(), any(), any(), any());
+
+    }
+    
+
     @DisplayName("검색 조건과 함께 이벤트 검색하면, 검색된 결과를 출력하여 보여준다.")
     @Test
     void givenSearchParams_whenSearchingEvents_thenReturnsEventList(){
@@ -86,7 +113,8 @@ class EventServiceTest {
                             .hasFieldOrPropertyWithValue("eventStatus", eventStatus);
                     assertThat(event.eventStartDatetime()).isAfterOrEqualTo(eventStartDatetime);
                             // 내가 검색한 내용의 시작 시간이 더 뒤에 있거나 혹은 같은지 검색하는 것
-                    assertThat(event.eventStartDatetime()).isBeforeOrEqualTo(eventStartDatetime);
+                    assertThat(event.eventStartDatetime
+                                ()).isBeforeOrEqualTo(eventStartDatetime);
 
                 });
         

@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(APIEventController.class)
+// 스프링의 slice test
 class APIEventControllerTest {
 
     private final MockMvc mvc;

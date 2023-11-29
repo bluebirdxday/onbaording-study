@@ -23,6 +23,7 @@ public enum ErrorCode {
 
     INTERNAL_ERROR(20000, ErrorCategory.SERVER_SIDE, "Internal error"),
     SPRING_INTERNAL_ERROR(20001, ErrorCategory.SERVER_SIDE,"Spring-detected internal error"),
+    DATA_ACCESS_ERROR(20002, ErrorCategory.SERVER_SIDE, "Data Access Error")
     ;
 
     private final Integer code;

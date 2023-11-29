@@ -32,11 +32,12 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     // ConstraintViolationException => 스프링이 알아서 처리해주지 않기 때문에 직접 exception handler 만들어줌
-    public ResponseEntity<Object> general(ConstraintViolationException e, WebRequest request){
+    public ResponseEntity<Object> validation(ConstraintViolationException e, WebRequest request){
 
         ErrorCode errorCode = ErrorCode.VALIDATION_ERROR;
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
+        // 부모 클래스에 넘겨줌
         return super.handleExceptionInternal(
                 e,
                 APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(e)),
@@ -49,36 +50,54 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 
 
-    // general exception이 터졌을 경우
+    // general exception이 터졌을 경우 (프로젝트에서 발생시키는 일반 오류)
+//    @ExceptionHandler
+//    public ResponseEntity<APIErrorResponse> general(GeneralException e){
+//
+//        ErrorCode errorCode = e.getErrorCode();
+//        HttpStatus status = errorCode.isClientSideError()?
+//                HttpStatus.BAD_REQUEST :
+//                HttpStatus.INTERNAL_SERVER_ERROR;
+//
+//        return ResponseEntity
+//                .status(status)
+//                .body(APIErrorResponse.of(
+//                        false, errorCode, errorCode.getMessage(e)
+//                ));
+//    }
     @ExceptionHandler
-    public ResponseEntity<APIErrorResponse> general(GeneralException e){
+    public ResponseEntity<Object> general(GeneralException e, WebRequest request){
 
         ErrorCode errorCode = e.getErrorCode();
         HttpStatus status = errorCode.isClientSideError()?
                 HttpStatus.BAD_REQUEST :
                 HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return ResponseEntity
-                .status(status)
-                .body(APIErrorResponse.of(
-                        false, errorCode, errorCode.getMessage(e)
-                ));
+        return super.handleExceptionInternal(
+                e,
+                APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(e)),
+                HttpHeaders.EMPTY,
+                status,
+                request
+        );
     }
 
 
     // 전체적으로 에러가 터졌을 경우
     // 우리가 예상하지 못한 일반적인 에러를 잡는 부분이라 전부 인터널 에러라고 확신하고 세팅해준 것
     @ExceptionHandler
-    public ResponseEntity<APIErrorResponse> exception(Exception e){
+    public ResponseEntity<Object> exception(Exception e, WebRequest request){
 
         ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return ResponseEntity
-                .status(status)
-                .body(APIErrorResponse.of(
-                        false, errorCode, errorCode.getMessage(e)
-                ));
+        return super.handleExceptionInternal(
+                e,
+                APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(e)),
+                HttpHeaders.EMPTY,
+                status,
+                request
+        );
     }
 
     // 상속 받은 것만으로 알아서 오류를 잘 처리하지만 다른 핸들러처럼 json 형태로 반환시키기 위해 재정의함
@@ -92,6 +111,18 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
                 APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(ex)),
                 headers,
                 statusCode,
+                request
+        );
+    }
+
+
+
+    private ResponseEntity<Object> handleExceptionInternal(Exception e, ErrorCode errorCode, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return super.handleExceptionInternal(
+                e,
+                APIErrorResponse.of(false, errorCode.getCode(), errorCode.getMessage(e)),
+                headers,
+                status,
                 request
         );
     }
